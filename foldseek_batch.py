@@ -14,12 +14,23 @@ os.makedirs(OUT_DIR, exist_ok=True)
 MAX_WAIT = 180  # max waiting time in seconds
 NO_PROGRESS_LIMIT = 5  # stop if no status change after 5 polls
 
+# List of FoldSeek databases to search
+FOLDSEEK_DATABASES = [
+    "afdb50",
+    "afdb-swissprot",
+    "afdb-proteome",
+    "cath50",
+    "mgnify_esm30",
+    "pdb100",
+    "gmgcl_id"
+]
+
 def submit_foldseek(file_path):
     """Submit a PDB structure to FoldSeek API and return the ticket info."""
     url = "https://search.foldseek.com/api/ticket"
     with open(file_path, "rb") as f:
         files = { "q": (os.path.basename(file_path), f, "application/octet-stream") }
-        data = [("mode", "3diaa"), ("database[]", "afdb-swissprot")]
+        data = [("mode", "3diaa")] + [("database[]", db) for db in FOLDSEEK_DATABASES]
         res = requests.post(url, files=files, data=data)
         res.raise_for_status()
         return res.json()
